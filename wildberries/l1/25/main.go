@@ -1,8 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-func main() {
-	fmt.Println("Hello World!")
+func sleep(duration time.Duration) {
+	tmr := time.NewTimer(duration)
+	<-tmr.C
 }
 
+func main() {
+	fmt.Println("hello")
+	sleep(1 * time.Second)
+	fmt.Println("bye")
+}
