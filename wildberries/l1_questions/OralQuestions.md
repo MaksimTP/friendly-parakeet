@@ -1273,9 +1273,69 @@ No
 Пример:
 m[0]=1 m[1]=124 m[2]=281
 
-I think 124 1 281, but i need to check it
+Рандомно, превалирует 1 124 281
 
 # 8. В чем разница make и new
+
+The new() function in Go is a built-in function that allocates memory for a new zeroed value of a specified type and returns a pointer to it. It is primarily used for initializing and obtaining a pointer to a newly allocated zeroed value of a given type, usually for data types like structs.
+
+Here's a simple example:
+
+```go
+package main
+
+import "fmt"
+
+type Person struct {
+    Name 	string
+    Age  	int
+    Gender 	string
+}
+
+func main() {
+    // Using new() to allocate memory for a Person struct
+    p := new(Person)
+
+    // Initializing the fields
+    p.Name = "John Doe"
+    p.Age = 30
+    p.Gender = "Male"
+
+    fmt.Println(p)
+}
+```
+
+In this example, new(Person) allocates memory for a new Person struct, and p is a pointer to the newly allocated zeroed value.
+
+On the other hand, the make() function is used for initializing slices, maps, and channels – data structures that require runtime initialization. Unlike new(), make() returns an initialized (non-zeroed) value of a specified type.
+
+Let's look at an example using a slice:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    // Using make() to create a slice with a specified length and capacity
+    s := make([]int, 10, 15)
+
+    // Initializing the elements
+    for i := 0; i < 10; i++ {
+        s[i] = i + 1
+    }
+
+    fmt.Println(s)
+}
+```
+
+When dealing with value types like structs, you can use new() to allocate memory for a new zeroed value. This is suitable for scenarios where you want a pointer to an initialized structure.
+
+For slices, maps, and channels, where initialization involves setting up data structures and internal pointers, use make() to create an initialized instance.
+
+Keep in mind that new() returns a pointer, while make() returns a non-zeroed value. Choose the appropriate method based on whether you need a pointer or an initialized value.
+
+Understanding the distinction between new() and make() in Go is crucial for writing clean and efficient code. By using the right method for the appropriate data types, you can ensure proper memory allocation and initialization in your Go programs.
 
 # 9. Сколько существует способов задать перенную типа slice или map
 
@@ -1296,3 +1356,90 @@ func main() {
     fmt.Println(*p)
 }
 ```
+
+# 11. Что выведет данная программа и почему?
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	wg := sync.WaitGroup{}
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(wg sync.WaitGroup, i int) {
+			fmt.Println(i)
+			wg.Done()
+		}(wg, i)
+	}
+	wg.Wait()
+	fmt.Println("exit")
+}
+```
+
+Выведет 0...4 в случайном порядке, потом случится deadlock, т.к. в горутину передается WaitGroup по значению, поэтому сигнализация об выполнении элемента группы. Метод Wait() ожидает завершения всех горутин из группы, но внутренний счетчик в WaitGroup будет равен 5, поэтому главный поток блокируется навсегда.
+
+# 12. Что выведет данная программа и почему?
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	n := 0
+	if true {
+		n := 1
+		n++
+	}
+	fmt.Println(n)
+}
+```
+
+Выведется 0. Создается переменная в локальной области видимости, она и будет инкрементироваться в блоке if.
+
+# 13. Что выведет данная программа и почему?
+
+```go
+package main
+
+import "fmt"
+
+func someAction(v []int8, b int8) {
+	v[0] = 100
+	v = append(v, b)
+}
+func main() {
+	var a = []int8{1, 2, 3, 4, 5}
+    someAction(a, 6)
+	fmt.Println(a)
+}
+```
+
+Выведется 100 2 3 4 5. Чтобы добавился новый элемент, нужно вернуть из функции слайс, он имеет уже новый адрес из реалокации памяти но новый адрес. Однако значение в нулевом индексе изменится, т.к. слайс изначально передается по указателю.
+
+
+# 14. Что выведет данная программа и почему?
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	slice := []string{"a", "a"}
+	func(slice []string) {
+		slice = append(slice, "a")
+		slice[0] = "b"
+		slice[1] = "b"
+		fmt.Print(slice)
+	}(slice)
+	fmt.Print(slice)
+}
+```
+
+Выведется [b b a] [a a]. Элемент "a" не добавится, т.к. возвращаемый слайс после операции `slice = append(slice, "a")` будет иметь другой адрес, т.к. происходит реаллокация слайса на новую область памяти.
