@@ -1,23 +1,52 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/nats-io/nats.go"
+	"github.com/nats-io/stan.go"
 )
 
-func main() {
-	// d := &db.DataBase{}
-	// d.Connect("postgres", db.DbInfo)
-	// d.Close()
-	nc, _ := nats.Connect(nats.DefaultURL)
+const (
+	clusterID = "test-cluster"
+	clientID  = "subscriber"
+	url       = "nats://localhost:4222"
+)
 
-	nc.Publish("foo", []byte("Hello World!"))
-	nc.Subscribe("foo", func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-	})
-	nc.Subscribe("request", func(m *nats.Msg) {
-		m.Respond([]byte("answer is 42"))
-	})
-	nc.Drain()
+type STANConn struct {
+	Sc stan.Conn
+}
+
+func (s *STANConn) Close() {
+	if s.Sc != nil {
+		s.Sc.Close()
+	}
+}
+
+func NewSTANConn() *STANConn {
+	sc, err := stan.Connect(clusterID, clientID, stan.NatsURL(url))
+	if err != nil {
+		log.Fatalf("Error connecting to NATS %v\n", err)
+	}
+	return &STANConn{sc}
+}
+func main() {
+
+	// sc := NewSTANConn()
+
+	// sc.Subscribe("order", func(m *stan.Msg) {
+	// 	fmt.Println("Received message:", string(m.Data))
+	// 	structData, err := model.ReadJSON(m.Data)
+	// 	if err != nil {
+	// 		log.Fatalf("error: %s", err.Error())
+	// 	}
+	// 	d.InsertData(structData)
+	// },
+	// 	stan.DeliverAllAvailable())
+
+	// data, err := os.ReadFile("model.json")
+	// if err != nil {
+	// 	log.Fatalf("error: %s", err.Error())
+	// }
+	// sc.Publish("order", data)
+
 }
