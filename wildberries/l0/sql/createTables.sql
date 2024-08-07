@@ -4,6 +4,7 @@ DROP TABLE delivery;
 DROP TABLE payment;
 
 CREATE TABLE IF NOT EXISTS "order" (
+    id BIGINT not NULL
     order_uid VARCHAR not NULL,
     track_number VARCHAR not NULL,
     entry VARCHAR not NULL,
@@ -20,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "order" (
     oof_shard VARCHAR
 );
 
-alter table "order" ADD CONSTRAINT uk_order unique (order_uid, delivery_id, payment_id);
+alter table "order" ADD CONSTRAINT uk_order unique (id, order_uid, delivery_id, payment_id);
 alter table "order" ADD CONSTRAINT ch_locale check ( locale in ('en', 'ru', 'kz', 'ua', 'kg', 'fr', 'de') );
 alter table "order" ADD CONSTRAINT fk_delivery_id FOREIGN KEY (delivery_id) REFERENCES delivery(id);
 alter table "order" ADD CONSTRAINT fk_payment_id FOREIGN KEY (payment_id) REFERENCES payment(id);

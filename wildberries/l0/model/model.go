@@ -1,10 +1,11 @@
-package data
+package model
 
 import (
 	"encoding/json"
 )
 
 type Order struct {
+	Id                int      `json:"-"`
 	OrderUid          string   `json:"order_uid"`
 	TrackNumber       string   `json:"track_number"`
 	Entry             string   `json:"entry"`

@@ -99,7 +99,8 @@ func (d *DataBase) InsertData(data model.Order) {
 		itemIds = append(itemIds, itemId)
 	}
 
-	_, err = d.db.Exec(insertStatementOrder, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, pq.Array(itemIds), data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
+	orderId := d.GetNextIdToInsert("order")
+	_, err = d.db.Exec(insertStatementOrder, orderId, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, pq.Array(itemIds), data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
 
 	if err != nil {
 		log.Println(err.Error())
