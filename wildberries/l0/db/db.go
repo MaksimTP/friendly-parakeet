@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	model "main/model"
+	"main/model"
 
 	"github.com/lib/pq"
 )

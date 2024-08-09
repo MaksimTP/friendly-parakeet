@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"main/db"
 	"main/model"
 	"sync"
 )
@@ -23,4 +24,11 @@ func (c *Cache) GetOrderById(i int) model.Order {
 		return order
 	}
 	return model.Order{}
+}
+
+func (c *Cache) RestoreDataFromDB(d db.DataBase) {
+	var data []model.Order = d.GetAllData()
+	for _, v := range data {
+		c.SaveData(v)
+	}
 }

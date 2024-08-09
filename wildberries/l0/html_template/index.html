@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 5px;
+            margin-bottom: 10px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="order-details">
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" name="orderId">
+            <div>
+                <label for="status">Status:</label>
+                <span id="status">Pending</span>
+            </div>
+        </div>
+    </div>
+
+    <div>
+            <tr>
+            <td> {{.Id}}</td>
+            <td>{{.OrderUid}}</td>
+            <td>{{.TrackNumber}}</td>
+            </tr>
+    </div>
+</body>
+</html>
