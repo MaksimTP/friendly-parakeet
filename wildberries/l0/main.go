@@ -39,12 +39,15 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		uid := req.URL.Query().Get("uid")
 		fmt.Println(uid)
-		order, err := c.GetOrderById(uid)
-		if err != nil {
-			log.Println(err)
-			return
-		} else {
-			log.Println(order.OrderUid)
+		order := model.Order{}
+		if uid != "" {
+			order, err := c.GetOrderById(uid)
+			if err != nil {
+				log.Println(err)
+				return
+			} else {
+				log.Println(order.OrderUid)
+			}
 		}
 		tmpl.Execute(w, order)
 	})
