@@ -40,12 +40,15 @@
 <body>
     <div class="container">
         <div class="order-details">
-            <label for="orderId">Order ID:</label>
-            <input type="text" id="orderId" name="orderId">
-            <div>
-                <label for="status">Status:</label>
-                <span id="status">Pending</span>
-            </div>
+            <form method="get">
+                <label for="orderId">Order ID:</label>
+                <input type="text" id="uid" name="uid">
+                <div>
+                    <label for="status">Status:</label>
+                    <span id="status">Pending</span>
+                    <button>Search</button>
+                </div>
+            </form>
         </div>
     </div>
 

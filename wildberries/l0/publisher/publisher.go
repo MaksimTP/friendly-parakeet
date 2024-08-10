@@ -13,7 +13,7 @@ type Publisher struct {
 
 const (
 	clusterID = "test-cluster"
-	clientID  = "subscriber"
+	clientID  = "publisher"
 	url       = "nats://localhost:4222"
 )
 

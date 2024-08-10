@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"main/model"
 	"sync"
 )
@@ -16,13 +17,13 @@ func (c *Cache) SaveData(data model.Order) {
 	c.cachedData[data.OrderUid] = data
 }
 
-func (c *Cache) GetOrderById(uid string) model.Order {
+func (c *Cache) GetOrderById(uid string) (model.Order, error) {
 	c.m.RLock()
 	defer c.m.RUnlock()
 	if order, found := c.cachedData[uid]; found {
-		return order
+		return order, nil
 	}
-	return model.Order{}
+	return model.Order{}, fmt.Errorf("cant find order with id %s in cache", uid)
 }
 
 func NewCache() *Cache {

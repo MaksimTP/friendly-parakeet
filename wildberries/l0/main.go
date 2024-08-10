@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-	order := model.Order{}
-
 	c := cache.NewCache()
 	d := db.DataBase{}
 	d.Connect("postgres", db.DbInfo)
@@ -24,7 +22,7 @@ func main() {
 	sub := subscriber.NewSubscriber()
 
 	sub.Sc.Subscribe("order", func(m *stan.Msg) {
-		fmt.Println("Received message:", string(m.Data))
+		fmt.Println("Sub got new message")
 		structData, err := model.ReadJSON(m.Data)
 		if err != nil {
 			log.Fatalf("error: %s", err.Error())
@@ -34,14 +32,22 @@ func main() {
 	},
 		stan.DeliverAllAvailable())
 
-	// select {}
-
-	tmpl, err := template.ParseFiles("html_template/index.html")
+	tmpl, err := template.ParseFiles("static/index.html")
 	if err != nil {
 		fmt.Println(err)
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		uid := req.URL.Query().Get("uid")
+		fmt.Println(uid)
+		order, err := c.GetOrderById(uid)
+		if err != nil {
+			log.Println(err)
+			return
+		} else {
+			log.Println(order.OrderUid)
+		}
 		tmpl.Execute(w, order)
 	})
-	http.ListenAndServe(":8000", nil)
+
+	http.ListenAndServe(":8080", nil)
 }
