@@ -61,8 +61,6 @@ type Payment struct {
 
 func ReadJSON(data []byte) (Order, error) {
 	res := Order{}
-	res.Id = 2
-	res.OrderUid = "123"
 	err := json.Unmarshal(data, &res)
 	return res, err
 }

@@ -99,8 +99,7 @@ func (d *DataBase) InsertData(data model.Order) {
 		itemIds = append(itemIds, itemId)
 	}
 
-	orderId := d.GetNextIdToInsert("order")
-	_, err = d.db.Exec(insertStatementOrder, orderId, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, pq.Array(itemIds), data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
+	_, err = d.db.Exec(insertStatementOrder, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, pq.Array(itemIds), data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -109,4 +108,15 @@ func (d *DataBase) InsertData(data model.Order) {
 
 // func (d *DataBase) GetInfoById(id int) {
 // 	query := "SELECT * FROM "
+// }
+
+// func (d *DataBase) GetAllData() []model.Order {
+// 	orders := make([]model.Order, 0)
+// 	rows, _ := d.db.Query(`SELECT * FROM "order" as o
+// 	JOIN delivery as d on o.delivery_id = d.id
+// 	JOIN payment as p on o.payment_id = p.id
+// 	JOIN item as i on i.id in o.items_ids`)
+// 	// for rows.Next() {
+
+// 	// }
 // }

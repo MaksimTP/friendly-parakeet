@@ -4,7 +4,6 @@ DROP TABLE delivery;
 DROP TABLE payment;
 
 CREATE TABLE IF NOT EXISTS "order" (
-    id BIGINT not NULL
     order_uid VARCHAR not NULL,
     track_number VARCHAR not NULL,
     entry VARCHAR not NULL,
@@ -74,4 +73,7 @@ CREATE TABLE IF NOT EXISTS delivery (
 
 alter table delivery ADD CONSTRAINT uk_delivery unique (id);
 
-SELECT * FROM delivery
+SELECT * FROM "order" as o
+JOIN delivery as d on o.delivery_id = d.id
+JOIN payment as p on o.payment_id = p.id
+JOIN item as i on i.id in o.items_ids 
