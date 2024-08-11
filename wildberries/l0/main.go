@@ -37,19 +37,18 @@ func main() {
 		fmt.Println(err)
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		tmpl.Execute(w, model.Order{OrderUid: "asd"})
+	})
+	http.HandleFunc("/order", func(w http.ResponseWriter, req *http.Request) {
 		uid := req.URL.Query().Get("uid")
-		fmt.Println(uid)
-		order := model.Order{}
-		if uid != "" {
-			order, err := c.GetOrderById(uid)
-			if err != nil {
-				log.Println(err)
-				return
-			} else {
-				log.Println(order.OrderUid)
-			}
+		// fmt.Println(uid)
+		order, err := c.GetOrderById(uid)
+		fmt.Println(order)
+		if err != nil {
+			log.Println("no order with that uid")
 		}
 		tmpl.Execute(w, order)
+
 	})
 
 	http.ListenAndServe(":8080", nil)

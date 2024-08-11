@@ -6,7 +6,7 @@ import (
 	"log"
 	"main/model"
 
-	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -53,11 +53,11 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 INSERT INTO delivery (id, name, phone, zip, city, address, region, email)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	insertStatementItem = `
-INSERT INTO item (id, chrt_id, track_number, price, rid, sale, size, total_price, nm_id, brand, status)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+INSERT INTO item (id, order_uid, chrt_id, track_number, price, rid, sale, size, total_price, nm_id, brand, status)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
 	insertStatementOrder = `
-INSERT INTO "order" (order_uid, track_number, entry, delivery_id, payment_id, items_ids, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
+INSERT INTO "order" (order_uid, track_number, entry, delivery_id, payment_id, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
 )
 
 func (d *DataBase) GetNextIdToInsert(tableName string) int {
@@ -88,18 +88,15 @@ func (d *DataBase) InsertData(data model.Order) {
 	}
 	itemId := d.GetNextIdToInsert("item")
 
-	itemIds := make([]int, 0)
-	itemIds = append(itemIds, itemId)
 	for _, v := range data.Items {
-		_, err = d.db.Exec(insertStatementItem, itemId, v.ChrtID, v.TrackNumber, v.Price, v.Rid, v.Sale, v.Size, v.TotalPrice, v.NmID, v.Brand, v.Status)
+		_, err = d.db.Exec(insertStatementItem, itemId, data.OrderUid, v.ChrtID, v.TrackNumber, v.Price, v.Rid, v.Sale, v.Size, v.TotalPrice, v.NmID, v.Brand, v.Status)
 		if err != nil {
 			log.Println(err.Error())
 		}
 		itemId++
-		itemIds = append(itemIds, itemId)
 	}
 
-	_, err = d.db.Exec(insertStatementOrder, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, pq.Array(itemIds), data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
+	_, err = d.db.Exec(insertStatementOrder, data.OrderUid, data.TrackNumber, data.Entry, deliveryID, paymentId, data.Locale, data.InternalSignature, data.CustomerID, data.DeliveryService, data.Shardkey, data.SmID, data.DateCreated, data.OofShard)
 
 	if err != nil {
 		log.Println(err.Error())

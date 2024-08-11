@@ -3,13 +3,13 @@
 -- DROP TABLE delivery;
 -- DROP TABLE payment;
 
-CREATE TABLE IF NOT EXISTS wb_lvl0."order" (
+CREATE TABLE IF NOT EXISTS "order" (
     order_uid VARCHAR not NULL,
     track_number VARCHAR not NULL,
     entry VARCHAR not NULL,
     delivery_id BIGINT not NULL,
     payment_id BIGINT not NULL,
-    items_ids BIGINT[],
+    -- items_ids BIGINT[],
     locale VARCHAR(2) not NULL,
     internal_signature VARCHAR,
     customer_id VARCHAR,
@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS wb_lvl0."order" (
     oof_shard VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS wb_lvl0.item (
+CREATE TABLE IF NOT EXISTS item (
     id BIGINT not NULL,
+    order_uid VARCHAR not NULL
     chrt_id BIGINT not NULL,
     track_number VARCHAR not NULL,
     price BIGINT,
@@ -35,9 +36,10 @@ CREATE TABLE IF NOT EXISTS wb_lvl0.item (
 );
 
 alter table item ADD CONSTRAINT uk_item unique (id);
+alter table item ADD CONSTRAINT fk_order_uid FOREIGN KEY (order_uid) REFERENCES order(order_uid);
 
 
-CREATE TABLE IF NOT EXISTS wb_lvl0.payment (
+CREATE TABLE IF NOT EXISTS payment (
     id BIGINT not NULL,
     transaction VARCHAR not NULL,
     request_id VARCHAR,
@@ -54,7 +56,7 @@ CREATE TABLE IF NOT EXISTS wb_lvl0.payment (
 alter table payment ADD CONSTRAINT uk_payment unique (id);
 
 
-CREATE TABLE IF NOT EXISTS wb_lvl0.delivery (
+CREATE TABLE IF NOT EXISTS delivery (
     id BIGINT not NULL,
     name VARCHAR not NULL,
     phone VARCHAR(20) not NULL,
@@ -72,7 +74,7 @@ alter table "order" ADD CONSTRAINT uk_order unique (order_uid, delivery_id, paym
 alter table "order" ADD CONSTRAINT ch_locale check ( locale in ('en', 'ru', 'kz', 'ua', 'kg', 'fr', 'de') );
 alter table "order" ADD CONSTRAINT fk_delivery_id FOREIGN KEY (delivery_id) REFERENCES delivery(id);
 alter table "order" ADD CONSTRAINT fk_payment_id FOREIGN KEY (payment_id) REFERENCES payment(id);
-alter table "order" ADD CONSTRAINT fk_item_id FOREIGN KEY (items_ids) REFERENCES item(id);
+-- alter table "order" ADD CONSTRAINT fk_item_id FOREIGN KEY (items_ids) REFERENCES item(id);
 
 
 -- SELECT * FROM "order" as o
