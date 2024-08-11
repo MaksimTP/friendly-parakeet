@@ -3,6 +3,9 @@
 -- DROP TABLE delivery;
 -- DROP TABLE payment;
 
+-- TRUNCATE TABLE "order",item,delivery,payment
+
+
 CREATE TABLE IF NOT EXISTS "order" (
     order_uid VARCHAR not NULL,
     track_number VARCHAR not NULL,
@@ -77,7 +80,7 @@ alter table "order" ADD CONSTRAINT fk_payment_id FOREIGN KEY (payment_id) REFERE
 -- alter table "order" ADD CONSTRAINT fk_item_id FOREIGN KEY (items_ids) REFERENCES item(id);
 
 
--- SELECT * FROM "order" as o
--- JOIN delivery as d on o.delivery_id = d.id
--- JOIN payment as p on o.payment_id = p.id
--- JOIN item as i on i.id in o.items_ids 
+SELECT * FROM "order" as o
+JOIN delivery as d on o.delivery_id = d.id
+JOIN payment as p on o.payment_id = p.id
+JOIN item as i on i.order_uid = o.order_uid

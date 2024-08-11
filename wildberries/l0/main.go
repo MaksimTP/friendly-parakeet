@@ -17,8 +17,7 @@ func main() {
 	c := cache.NewCache()
 	d := db.DataBase{}
 	d.Connect("postgres", db.DbInfo)
-	// c.RestoreDataFromDB(d)
-
+	c.RestoreDataFromDB(d)
 	sub := subscriber.NewSubscriber()
 
 	sub.Sc.Subscribe("order", func(m *stan.Msg) {
@@ -37,11 +36,10 @@ func main() {
 		fmt.Println(err)
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		tmpl.Execute(w, model.Order{OrderUid: "asd"})
+		tmpl.Execute(w, model.Order{})
 	})
 	http.HandleFunc("/order", func(w http.ResponseWriter, req *http.Request) {
 		uid := req.URL.Query().Get("uid")
-		// fmt.Println(uid)
 		order, err := c.GetOrderById(uid)
 		fmt.Println(order)
 		if err != nil {

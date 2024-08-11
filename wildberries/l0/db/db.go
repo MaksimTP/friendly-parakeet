@@ -107,13 +107,33 @@ func (d *DataBase) InsertData(data model.Order) {
 // 	query := "SELECT * FROM "
 // }
 
-// func (d *DataBase) GetAllData() []model.Order {
-// 	orders := make([]model.Order, 0)
-// 	rows, _ := d.db.Query(`SELECT * FROM "order" as o
-// 	JOIN delivery as d on o.delivery_id = d.id
-// 	JOIN payment as p on o.payment_id = p.id
-// 	JOIN item as i on i.id in o.items_ids`)
-// 	// for rows.Next() {
+func (d *DataBase) GetAllData() []model.Order {
+	orders := make([]model.Order, 0)
+	rows, _ := d.db.Query(`SELECT * FROM "order" as o
+	JOIN delivery as d on o.delivery_id = d.id
+	JOIN payment as p on o.payment_id = p.id
+	JOIN item as i on i.order_uid = o.order_uid`)
 
-// 	// }
-// }
+	var order_uid, track_number, entry, delivery_id, payment_id, locale, internal_signature, customer_id, delivery_service, shardkey, date_created, oof_shard, id, name, phone, zip, city, address, region, email, id1, transaction, request_id, currency, provider, bank, id2, order_uid2, track_number1, rid, size, brand string
+	var amount, payment_dt, delivery_cost, goods_total, custom_fee, chrt_id, price, sale, total_price, nm_id, status, sm_id int64
+	is_new_order := true
+	prev_order_uid := ""
+	for rows.Next() {
+		rows.Scan(&order_uid, &track_number, &entry, &delivery_id, &payment_id, &locale, &internal_signature, &customer_id, &delivery_service, &shardkey, &sm_id, &date_created, &oof_shard, &id, &name, &phone, &zip, &city, &address, &region, &email, &id1, &transaction, &request_id, &currency, &provider, &amount, &payment_dt, &bank, &delivery_cost, &goods_total, &custom_fee, &id2, &order_uid2, &chrt_id, &track_number1, &price, &rid, &sale, &size, &total_price, &nm_id, &brand, &status)
+		if len(orders) != 0 {
+			is_new_order = prev_order_uid == order_uid
+		}
+
+		if is_new_order {
+			orders = append(orders, model.Order{OrderUid: order_uid, TrackNumber: track_number, Entry: entry, Delivery: model.Delivery{Name: name, Phone: phone, Zip: zip, City: city, Address: address, Region: region, Email: email}, Payment: model.Payment{Transaction: transaction, RequestID: request_id, Currency: currency, Provider: provider, Amount: amount, PaymentDt: payment_dt, Bank: bank, DeliveryCost: delivery_cost, GoodsTotal: goods_total, CustomFee: custom_fee}, Items: []model.Item{model.Item{ChrtID: chrt_id, TrackNumber: track_number1, Price: price, Rid: rid, Name: name, Sale: sale, Size: size, TotalPrice: total_price, NmID: nm_id, Brand: brand, Status: status}}})
+		} else {
+			for k, order := range orders {
+				if order.OrderUid == order_uid {
+					orders[k].Items = append(orders[k].Items, model.Item{ChrtID: chrt_id, TrackNumber: track_number1, Price: price, Rid: rid, Name: name, Sale: sale, Size: size, TotalPrice: total_price, NmID: nm_id, Brand: brand, Status: status})
+				}
+			}
+		}
+		prev_order_uid = order_uid
+	}
+	return orders
+}

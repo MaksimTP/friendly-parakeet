@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"main/db"
 	"main/model"
 	"sync"
 )
@@ -30,9 +31,9 @@ func NewCache() *Cache {
 	return &Cache{make(map[string]model.Order), sync.RWMutex{}}
 }
 
-// func (c *Cache) RestoreDataFromDB(d db.DataBase) {
-// 	var data []model.Order = d.GetAllData()
-// 	for _, v := range data {
-// 		c.SaveData(v)
-// 	}
-// }
+func (c *Cache) RestoreDataFromDB(d db.DataBase) {
+	var data []model.Order = d.GetAllData()
+	for _, v := range data {
+		c.SaveData(v)
+	}
+}
