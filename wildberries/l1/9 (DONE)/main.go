@@ -25,8 +25,11 @@ func main() {
 		}
 	}()
 
-	for {
-		fmt.Printf("squared: %d\n", <-out)
+	for v := range out {
+		fmt.Printf("squared: %d\n", v)
 	}
+	// for {
+	// 	fmt.Printf("squared: %d\n", <-out)
+	// }
 
 }

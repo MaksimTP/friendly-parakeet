@@ -23,7 +23,6 @@ type Options struct {
 	patterns []string //
 }
 
-// TODO: REWORK, use argparse
 func parseArgs() (Options, []string) {
 	parser := argparse.NewParser("cut", "this is a cut program")
 
@@ -34,19 +33,32 @@ func parseArgs() (Options, []string) {
 	iPtr := parser.Flag("i", "ignore-case", nil)
 	vPtr := parser.Flag("v", "invert", nil)
 	FPtr := parser.Flag("F", "fixed", nil)
-	nPtr := parser.Flag("n", "line-nuь", nil)
-	files := parser.StringPositional(nil)
+	nPtr := parser.Flag("n", "line-num", nil)
+	files := make([]*string, 50)
+
+	for i := 0; i < 50; i++ {
+		s := parser.StringPositional(nil)
+		files = append(files, s)
+	}
+
 	err := parser.Parse(os.Args)
+	returnFiles := make([]string, 0)
+
+	for _, file := range files {
+		if file != nil {
+			if *file != "" {
+				returnFiles = append(returnFiles, *file)
+			}
+		}
+	}
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// files := parser.Args()
-
 	opts := Options{A: *APtr, B: *BPtr, C: *CPtr, c: *cPtr, i: *iPtr, v: *vPtr, F: *FPtr, n: *nPtr}
 
-	return opts, []string{*files}
+	return opts, returnFiles
 }
 
 func readFile(path string) ([]string, error) {
@@ -108,19 +120,21 @@ func grep(data []string, opts Options) {
 
 func main() {
 	opts, files := parseArgs()
-	fmt.Println(opts, files)
+	// fmt.Println(opts, files)
 	data := make([]string, 0)
 	if len(files) == 0 {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			data = append(data, scanner.Text())
 		}
+		grep(data, opts)
 	} else {
 		for _, file := range files {
 			data, err := readFile(file)
 			if err != nil {
 				log.Fatalln(err)
 			}
+			grep(data, opts)
 		}
 	}
 

@@ -2,18 +2,19 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/akamensky/argparse"
 )
 
 var months []string = []string{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"}
 
 type Options struct {
-	k int // []int
+	k []int
 	n bool
 	r bool
 	u bool
@@ -23,26 +24,61 @@ type Options struct {
 	h bool
 }
 
+// -k — указание колонки для сортировки (слова в строке могут выступать в качестве колонок, по умолчанию разделитель — пробел)
+//
+//	-n — сортировать по числовому значению
+//	-r — сортировать в обратном порядке
+//	-u — не выводить повторяющиеся строки
+//	Дополнительно
+//	Реализовать поддержку утилитой следующих ключей:
+//	-M — сортировать по названию месяца
+//	-b — игнорировать хвостовые пробелы
+//	-c — проверять отсортированы ли данные
+//	-h — сортировать по числовому значению с учетом суффиксов
 func parseArgs() (Options, []string) {
-	kPtr := flag.Int("k", 0, "column to sort")
-	nPtr := flag.Bool("n", false, "sort by number")
-	rPtr := flag.Bool("r", false, "reverse sort")
-	uPtr := flag.Bool("u", false, "unique rows")
-	MPtr := flag.Bool("M", false, "sort by month")
-	bPtr := flag.Bool("b", false, "ignore tail spaces")
-	hPtr := flag.Bool("c", false, "")
+	parser := argparse.NewParser("cut", "this is a cut program")
 
-	flag.Parse()
+	kPtr := parser.IntList("k", "key", nil)
+	nPtr := parser.Flag("n", "numeric-sort", nil)
+	rPtr := parser.Flag("r", "reverse", nil)
+	uPtr := parser.Flag("u", "unique", nil)
+	MPtr := parser.Flag("M", "month-sort", nil)
+	bPtr := parser.Flag("b", "ignore-leading-blanks", nil)
+	cPtr := parser.Flag("c", "check", nil)
+	hPtr := parser.Flag("h", "human-numeric-sort", nil)
 
-	files := flag.Args()
+	parser.Parse(os.Args)
+
+	files := make([]*string, 50)
+
+	for i := 0; i < 50; i++ {
+		s := parser.StringPositional(nil)
+		files = append(files, s)
+	}
+
+	err := parser.Parse(os.Args)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	returnFiles := make([]string, 0)
+
+	for _, file := range files {
+		if file != nil {
+			if *file != "" {
+				returnFiles = append(returnFiles, *file)
+			}
+		}
+	}
 
 	if len(files) == 0 {
 		log.Fatalln("error: no files provided")
 	}
 
-	opts := Options{k: *kPtr, n: *nPtr, r: *rPtr, u: *uPtr, M: *MPtr, b: *bPtr, h: *hPtr}
+	opts := Options{k: *kPtr, n: *nPtr, r: *rPtr, u: *uPtr, M: *MPtr, b: *bPtr, c: *cPtr, h: *hPtr}
 
-	return opts, files
+	return opts, returnFiles
 }
 
 func readFile(path string) ([]string, error) {
@@ -64,9 +100,9 @@ func readFile(path string) ([]string, error) {
 	return res, nil
 }
 
-func isSorted(data []string, reversed bool) bool {
+// func isSorted(data []string, reversed bool) bool {
 
-}
+// }
 
 func isMonth(s string) bool {
 	if len(s) < 3 {
@@ -86,9 +122,9 @@ func isNumeric(s string) bool {
 	return err == nil
 }
 
-func isHumanNumeric(s string) bool {
+// func isHumanNumeric(s string) bool {
 
-}
+// }
 
 func isDuplicate(arr []string, s string) bool {
 	for _, line := range arr {
@@ -100,7 +136,7 @@ func isDuplicate(arr []string, s string) bool {
 }
 
 func sort(data []string, opts Options) []string {
-
+	return []string{}
 }
 
 func main() {
@@ -112,12 +148,16 @@ func main() {
 		for scanner.Scan() {
 			data = append(data, scanner.Text())
 		}
+		res := sort(data, opts)
+		fmt.Println(res)
 	} else {
 		for _, file := range files {
 			data, err := readFile(file)
 			if err != nil {
 				log.Fatalln(err)
 			}
+			res := sort(data, opts)
+			fmt.Println(res)
 		}
 	}
 }

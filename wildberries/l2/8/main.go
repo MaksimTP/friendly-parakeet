@@ -1,8 +1,13 @@
 package main
 
-import "fmt"
-
-func main() {
-	fmt.Println("Hello World!")
+type OS interface {
+	ChangeDirectory(args []string)
+	Pwd() string
+	Echo(args []string)
+	Kill(args []string)
+	ps(args []string)
 }
 
+func main() {
+
+}
