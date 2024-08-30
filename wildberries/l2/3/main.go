@@ -136,7 +136,11 @@ func isDuplicate(arr []string, s string) bool {
 }
 
 func sort(data []string, opts Options) []string {
-	return []string{}
+	res := []string{}
+	for _, line := range data {
+
+	}
+	return res
 }
 
 func main() {

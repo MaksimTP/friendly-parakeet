@@ -11,6 +11,7 @@ import (
 	"github.com/akamensky/argparse"
 )
 
+// TODO: Implement A,B,C
 type Options struct {
 	A        int      // -A - "after" печатать +N строк после совпадения
 	B        int      // -B - "before" печатать +N строк до совпадения
@@ -83,11 +84,14 @@ func readFile(path string) ([]string, error) {
 func grep(data []string, opts Options) {
 	matchedCount := 0
 	matched := false
+	result := make([]string, 0)
 	for lineCount, line := range data {
+		var lineToAppend string
 		matched = false
 		changed_line := strings.Clone(line)
 		if opts.n {
-			fmt.Printf("%d:", lineCount+1)
+			lineToAppend += fmt.Sprintf("%d:", lineCount+1)
+			// fmt.Printf("%d:", lineCount+1)
 		}
 		if opts.i {
 			changed_line = strings.ToLower(line)
@@ -104,7 +108,9 @@ func grep(data []string, opts Options) {
 			}
 
 			if matched && !opts.c && !opts.F {
-				fmt.Printf("%s\n", changed_line)
+				lineToAppend += fmt.Sprintf("%s\n", changed_line)
+				result = append(result, lineToAppend)
+				// fmt.Printf("%s\n", changed_line)
 				break
 			}
 		}
@@ -115,12 +121,15 @@ func grep(data []string, opts Options) {
 
 	if opts.c {
 		fmt.Println(matchedCount)
+	} else {
+		for _, line := range result {
+			fmt.Print(line)
+		}
 	}
 }
 
 func main() {
 	opts, files := parseArgs()
-	// fmt.Println(opts, files)
 	data := make([]string, 0)
 	if len(files) == 0 {
 		scanner := bufio.NewScanner(os.Stdin)
